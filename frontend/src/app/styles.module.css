@@ -1,15 +1,15 @@
 .container {
-  max-width: 1200px;
+  max-width:900px;
   margin: 0 auto;
   padding: 2rem;
 }
 
 .header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 600;
   color: #1e3a8a;
 }

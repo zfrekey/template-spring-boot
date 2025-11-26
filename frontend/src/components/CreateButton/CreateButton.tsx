@@ -1,5 +1,14 @@
-import styles from './styles.module.css'
+import styles from './styles.module.css';
 
-export default function Button() {
-    return <button>Ok</button>;
+interface CreateButtonProps {
+  onClick?: () => void;
+}
+
+export default function CreateButton({ onClick }: CreateButtonProps) {
+  return (
+    <button className={styles.button} onClick={onClick}>
+      <span className={styles.icon}>+</span>
+      Criar Usuário
+    </button>
+  );
 }
