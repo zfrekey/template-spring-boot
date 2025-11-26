@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import  FilterInput from '@/components/FilterInput/filterInput';
+import FilterInput from '@/components/FilterInput/filterInput';
 import styles from './styles.module.css';
-import  CreateButton from '@/components/CreateButton/createButton';
+import CreateButton from '@/components/CreateButton/createButton';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');

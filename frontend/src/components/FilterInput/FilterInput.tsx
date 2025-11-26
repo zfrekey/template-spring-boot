@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import Image from 'next/image';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface FilterInputProps {
   value: string;
@@ -8,8 +10,15 @@ interface FilterInputProps {
 
 export default function FilterInput({  
   value, 
-  onChange 
+  onChange
 }: FilterInputProps) {
+  const [inputValue, setInputValue] = useState(value);
+  const debouncedValue = useDebounce(inputValue);
+
+  useEffect(() => {
+    onChange(debouncedValue);
+  }, [debouncedValue]);
+
   return (
     <div className={styles.inputWrapper}>
       <Image 
@@ -23,8 +32,8 @@ export default function FilterInput({
         type="text"
         className={styles.input}
         placeholder="Buscar por Nome ou CPF..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
       />
     </div>
   );
