@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-
-interface UserData {
-  name: string;
-  cpf: string;
-  birthDate: string;
-  gender: string;
-}
+import { UserData } from '@/types/user';
 
 interface UsePostUsersReturn {
   postUser: (userData: UserData) => Promise<void>;

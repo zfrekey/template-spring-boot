@@ -9,6 +9,7 @@ interface InputProps {
   error?: string;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export default function Input({
@@ -19,7 +20,8 @@ export default function Input({
   onChange,
   error,
   placeholder,
-  required = false
+  required = false,
+  disabled = false
 }: InputProps) {
   return (
     <div className={styles.formGroup}>
@@ -33,6 +35,7 @@ export default function Input({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        disabled={disabled}
         className={error ? styles.inputError : styles.input}
       />
       {error && <span className={styles.error}>{error}</span>}
