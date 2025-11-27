@@ -6,37 +6,37 @@ import styles from './styles.module.css';
 import Input from '@/components/Input/Input';
 import Select from '@/components/Select/Select';
 import { usePostUsers } from '@/hooks/usePostUsers';
+import { userSchema, UserData, Gender } from '@/types/user';
 
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
   onError: () => void;
+  mode?: 'create' | 'edit';
+  initialData?: UserData;
 }
 
-const userSchema = z.object({
-  name: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
-  cpf: z.string()
-    .min(1, 'CPF é obrigatório')
-    .refine(
-      (val) => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(val) || /^\d{11}$/.test(val),
-      'CPF inválido (use 000.000.000-00 ou 11 dígitos)'
-    ),
-  birthDate: z.string().min(1, 'Data de nascimento é obrigatória'),
-  gender: z.enum(['M', 'F'], { message: 'Selecione um sexo válido' })
-});
-
-type UserData = z.infer<typeof userSchema>;
-
-export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserModalProps) {
-  const [formData, setFormData] = useState<UserData>({
-    name: '',
-    cpf: '',
-    birthDate: '',
-    gender: '' as 'M' | 'F'
-  });
+export default function UserModal({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  onError, 
+  mode = 'create',
+  initialData 
+}: UserModalProps) {
+  const [formData, setFormData] = useState<UserData>(
+    initialData || {
+      name: '',
+      cpf: '',
+      birthDate: '',
+      gender: '' as Gender
+    }
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { postUser, isLoading } = usePostUsers();
+
+  const isEditMode = mode === 'edit';
 
   if (!isOpen) return null;
 
@@ -49,7 +49,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
       
       await postUser(validatedData);
       
-      setFormData({ name: '', cpf: '', birthDate: '', gender: '' as 'M' | 'F' });
+      setFormData({ name: '', cpf: '', birthDate: '', gender: '' as Gender });
       onSuccess();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -67,7 +67,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', cpf: '', birthDate: '', gender: '' as 'M' | 'F' });
+    setFormData({ name: '', cpf: '', birthDate: '', gender: '' as Gender });
     setErrors({});
     onClose();
   };
@@ -75,7 +75,9 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
   return (
     <div className={styles.overlay} onClick={handleCancel}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h2 className={styles.title}>Criar Novo Usuário</h2>
+        <h2 className={styles.title}>
+          {isEditMode ? 'Editar Usuário' : 'Criar Novo Usuário'}
+        </h2>
         
         <form onSubmit={handleSubmit} className={styles.form}>
           <Input
@@ -94,6 +96,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
             onChange={(value) => setFormData({ ...formData, cpf: value })}
             placeholder="000.000.000-00"
             error={errors.cpf}
+            disabled={isEditMode}
             required
           />
 
@@ -111,7 +114,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
             id="gender"
             label="Sexo"
             value={formData.gender}
-            onChange={(value) => setFormData({ ...formData, gender: value as 'M' | 'F' })}
+            onChange={(value) => setFormData({ ...formData, gender: value as Gender })}
             options={[
               { value: 'M', label: 'Masculino' },
               { value: 'F', label: 'Feminino' }
@@ -125,7 +128,10 @@ export default function UserModal({ isOpen, onClose, onSuccess, onError }: UserM
               Cancelar
             </button>
             <button type="submit" className={styles.submitButton} disabled={isLoading}>
-              {isLoading ? 'Criando...' : 'Adicionar'}
+              {isLoading 
+                ? (isEditMode ? 'Salvando...' : 'Criando...') 
+                : (isEditMode ? 'Salvar' : 'Adicionar')
+              }
             </button>
           </div>
         </form>
