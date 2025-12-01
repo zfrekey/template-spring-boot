@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { UserData } from '@/types/user';
+import { UserCreate } from '@/types/user';
 
 interface UsePostUsersReturn {
-  postUser: (userData: UserData) => Promise<void>;
+  postUser: (userData: UserCreate) => Promise<void>;
   isLoading: boolean;
   error: string | null;
 }
@@ -12,14 +12,19 @@ export function usePostUsers(): UsePostUsersReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postUser = async (userData: UserData) => {
+  const postUser = async (userData: UserCreate) => {
     setIsLoading(true);
     setError(null);
 
     try {
+      const payload = {
+        ...userData,
+        cpf: userData.cpf.replace(/\D/g, '')
+      };
+      
       const { data } = await axios.post(
-        `${process.env.BACKEND_URL}/api/users`, 
-        userData
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, 
+        payload
       );
       return data;
     } catch (err) {

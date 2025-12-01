@@ -114,3 +114,13 @@
   display: block;
   font-weight: 500;
 }
+
+.helperText {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

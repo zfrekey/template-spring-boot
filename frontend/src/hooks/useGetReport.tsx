@@ -17,7 +17,7 @@ export function useGetReport(): UseGetReportReturn {
 
     try {
       const response = await axios.get(
-        `${process.env.BACKEND_URL}/api/relatorio`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/reports`,
         { responseType: 'blob' }
       );
 

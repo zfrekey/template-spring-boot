@@ -2,22 +2,20 @@ import { useState } from 'react';
 import axios from 'axios';
 
 interface UseDeleteUserReturn {
-  deleteUser: (userCpf: string) => Promise<void>;
+  deleteUser: (userId: number) => Promise<void>;
   isLoading: boolean;
   error: string | null;
-}
-
-export function useDeleteUser(): UseDeleteUserReturn {
+}export function useDeleteUser(): UseDeleteUserReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const deleteUser = async (userCpf: string) => {
+  const deleteUser = async (userId: number) => {
     setIsLoading(true);
     setError(null);
 
     try {
       await axios.delete(
-        `${process.env.BACKEND_URL}/api/users/${userCpf}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`
       );
     } catch (err) {
       const errorMessage = axios.isAxiosError(err) 

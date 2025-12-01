@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import styles from './styles.module.css';
 import Input from '@/components/Input/Input';
 import Select from '@/components/Select/Select';
 import { usePostUsers } from '@/hooks/usePostUsers';
-import { userSchema, UserData, Gender } from '@/types/user';
+import { useEditUser } from '@/hooks/useEditUser';
+import { userCreateSchema, userEditSchema, UserCreate, UserResponse, Gender } from '@/types/user';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -14,7 +15,7 @@ interface UserModalProps {
   onSuccess: () => void;
   onError: () => void;
   mode?: 'create' | 'edit';
-  initialData?: UserData;
+  initialData?: UserResponse;
 }
 
 export default function UserModal({ 
@@ -25,18 +26,26 @@ export default function UserModal({
   mode = 'create',
   initialData 
 }: UserModalProps) {
-  const [formData, setFormData] = useState<UserData>(
-    initialData || {
-      name: '',
-      cpf: '',
-      birthDate: '',
-      gender: '' as Gender
-    }
-  );
+  const [formData, setFormData] = useState<UserCreate>({
+    name: '',
+    cpf: '',
+    nascimento: '',
+    sexo: '' as Gender
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { postUser, isLoading } = usePostUsers();
+  const { postUser, isLoading: isCreating } = usePostUsers();
+  const { editUser, isLoading: isEditing } = useEditUser();
 
   const isEditMode = mode === 'edit';
+  const isLoading = isCreating || isEditing;
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else {
+      setFormData({ name: '', cpf: '', nascimento: '', sexo: '' as Gender });
+    }
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
@@ -44,12 +53,21 @@ export default function UserModal({
     e.preventDefault();
     
     try {
-      const validatedData = userSchema.parse(formData);
       setErrors({});
       
-      await postUser(validatedData);
+      if (isEditMode && initialData && 'id' in initialData) {
+        const validatedEditData = userEditSchema.parse({
+          name: formData.name,
+          nascimento: formData.nascimento,
+          sexo: formData.sexo
+        });
+        await editUser(initialData.id, validatedEditData);
+      } else {
+        const validatedCreateData = userCreateSchema.parse(formData);
+        await postUser(validatedCreateData);
+      }
       
-      setFormData({ name: '', cpf: '', birthDate: '', gender: '' as Gender });
+      setFormData({ name: '', cpf: '', nascimento: '', sexo: '' as Gender });
       onSuccess();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -67,7 +85,7 @@ export default function UserModal({
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', cpf: '', birthDate: '', gender: '' as Gender });
+    setFormData({ name: '', cpf: '', nascimento: '', sexo: '' as Gender });
     setErrors({});
     onClose();
   };
@@ -89,37 +107,44 @@ export default function UserModal({
             required
           />
 
-          <Input
-            id="cpf"
-            label="CPF"
-            value={formData.cpf}
-            onChange={(value) => setFormData({ ...formData, cpf: value })}
-            placeholder="000.000.000-00"
-            error={errors.cpf}
-            disabled={isEditMode}
-            required
-          />
+          <div>
+            <Input
+              id="cpf"
+              label="CPF"
+              value={formData.cpf}
+              onChange={(value) => setFormData({ ...formData, cpf: value })}
+              placeholder="000.000.000-00"
+              error={errors.cpf}
+              disabled={isEditMode}
+              required
+            />
+            {isEditMode && (
+              <p className={styles.helperText}>
+                O CPF não pode ser alterado
+              </p>
+            )}
+          </div>
 
           <Input
-            id="birthDate"
+            id="nascimento"
             label="Data de Nascimento"
             type="date"
-            value={formData.birthDate}
-            onChange={(value) => setFormData({ ...formData, birthDate: value })}
-            error={errors.birthDate}
+            value={formData.nascimento}
+            onChange={(value) => setFormData({ ...formData, nascimento: value })}
+            error={errors.nascimento}
             required
           />
 
           <Select
-            id="gender"
+            id="sexo"
             label="Sexo"
-            value={formData.gender}
-            onChange={(value) => setFormData({ ...formData, gender: value as Gender })}
+            value={formData.sexo}
+            onChange={(value) => setFormData({ ...formData, sexo: value as Gender })}
             options={[
               { value: 'MASCULINO', label: 'Masculino' },
               { value: 'FEMININO', label: 'Feminino' }
             ]}
-            error={errors.gender}
+            error={errors.sexo}
             required
           />
 
