@@ -22,6 +22,14 @@
   transform: scale(0.98);
 }
 
+.button.yellow {
+  background: #F7B538;
+}
+
+.button.yellow:hover {
+  background: #D89D2A;
+}
+
 .icon {
   font-size: 1.25rem;
   font-weight: 600;

@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <footer>
-          Copyright © 2025
+          Dataprev © 2025
         </footer>
       </body>
     </html>

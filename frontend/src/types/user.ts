@@ -9,9 +9,9 @@ export const userSchema = z.object({
       'CPF inválido (use 000.000.000-00 ou 11 dígitos)'
     ),
   birthDate: z.string().min(1, 'Data de nascimento é obrigatória'),
-  gender: z.enum(['M', 'F'], { message: 'Selecione um sexo válido' })
+  gender: z.enum(['MASCULINO', 'FEMININO'], { message: 'Selecione um sexo válido' })
 });
 
 export type UserData = z.infer<typeof userSchema>;
 
-export type Gender = 'M' | 'F';
+export type Gender = 'MASCULINO' | 'FEMININO';

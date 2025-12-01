@@ -116,8 +116,8 @@ export default function UserModal({
             value={formData.gender}
             onChange={(value) => setFormData({ ...formData, gender: value as Gender })}
             options={[
-              { value: 'M', label: 'Masculino' },
-              { value: 'F', label: 'Feminino' }
+              { value: 'MASCULINO', label: 'Masculino' },
+              { value: 'FEMININO', label: 'Feminino' }
             ]}
             error={errors.gender}
             required
