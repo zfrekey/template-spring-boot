@@ -13,7 +13,7 @@ interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  onError: () => void;
+  onError: (message: string) => void;
   mode?: 'create' | 'edit';
   initialData?: UserResponse;
 }
@@ -79,7 +79,14 @@ export default function UserModal({
         });
         setErrors(newErrors);
       } else {
-        onError();
+        let errorMessage = 'Erro ao processar requisição';
+        
+        if ((error as any)?.response?.data) {
+          const data = (error as any).response.data;
+          errorMessage = data.message || data.error || data || errorMessage;
+        }
+        
+        onError(errorMessage);
       }
     }
   };

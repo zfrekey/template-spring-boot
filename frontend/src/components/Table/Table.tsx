@@ -6,12 +6,13 @@ import Image from 'next/image';
 interface TableProps {
   data?: PageResponse<User> | null;
   isLoading?: boolean;
+  error?: string | null;
   onPageChange: (page: number) => void;
   onEdit: (user: User) => void;
   onDelete: (id: number) => void;
 }
 
-export default function Table({ data, isLoading, onPageChange, onEdit, onDelete }: TableProps) {
+export default function Table({ data, isLoading, error, onPageChange, onEdit, onDelete }: TableProps) {
   const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
@@ -35,7 +36,11 @@ export default function Table({ data, isLoading, onPageChange, onEdit, onDelete 
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {error ? (
+              <tr>
+                <td colSpan={5} className={styles.emptyState}>{error}</td>
+              </tr>
+            ) : isLoading ? (
               <tr>
                 <td colSpan={5} className={styles.emptyState}>Carregando...</td>
               </tr>

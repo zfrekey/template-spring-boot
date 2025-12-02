@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { api } from '@/services/api';
 import axios from 'axios';
 
 interface UseDeleteUserReturn {
@@ -14,9 +15,7 @@ interface UseDeleteUserReturn {
     setError(null);
 
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${userId}`
-      );
+      await api.delete(`/users/${userId}`);
     } catch (err) {
       const errorMessage = axios.isAxiosError(err) 
         ? err.response?.data?.message || 'Erro ao deletar usuário'

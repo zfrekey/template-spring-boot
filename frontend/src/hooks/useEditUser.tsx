@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { api } from '@/services/api';
 import { UserEdit } from '@/types/user';
+import axios from 'axios';
 
 interface UseEditUserReturn {
   editUser: (id: number, userData: UserEdit) => Promise<void>;
@@ -17,10 +18,7 @@ export function useEditUser(): UseEditUserReturn {
     setError(null);
 
     try {
-      const { data } = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${id}`, 
-        userData
-      );
+      const { data } = await api.patch(`/users/${id}`, userData);
       return data;
     } catch (err) {
       const errorMessage = axios.isAxiosError(err) 

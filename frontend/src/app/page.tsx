@@ -13,10 +13,17 @@ import { useGetUsers } from '@/hooks/useGetUsers';
 import { useDeleteUser } from '@/hooks/useDeleteUser';
 import { User } from '@/types/page';
 
+type ToastType = 'success' | 'error' | 'info';
+
+interface ToastState {
+  message: string;
+  type: ToastType;
+}
+
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -30,16 +37,29 @@ export default function Home() {
   });
   const { deleteUser } = useDeleteUser();
 
-  const handleSuccess = () => {
-    const message = selectedUser ? 'Usuário editado com sucesso!' : 'Usuário criado com sucesso!';
+  const closeModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
-    setToast({ message, type: 'success' });
+  };
+
+  const closeConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+    setUserIdToDelete(null);
+  };
+
+  const showToast = (message: string, type: ToastType) => {
+    setToast({ message, type });
+  };
+
+  const handleSuccess = () => {
+    const message = selectedUser ? 'Usuário editado com sucesso!' : 'Usuário criado com sucesso!';
+    closeModal();
+    showToast(message, 'success');
     refetch();
   };
 
-  const handleError = () => {
-    setToast({ message: 'Erro ao criar usuário. Tente novamente.', type: 'error' });
+  const handleError = (message: string) => {
+    showToast(message, 'error');
   };
 
   const handleEdit = (user: User) => {
@@ -57,28 +77,23 @@ export default function Home() {
 
     try {
       await deleteUser(userIdToDelete);
-      setToast({ message: 'Usuário deletado com sucesso!', type: 'success' });
+      showToast('Usuário deletado com sucesso!', 'success');
       refetch();
-    } catch (error) {
-      setToast({ message: 'Erro ao deletar usuário. Tente novamente.', type: 'error' });
+    } catch {
+      showToast('Erro ao deletar usuário. Tente novamente.', 'error');
     } finally {
-      setIsConfirmModalOpen(false);
-      setUserIdToDelete(null);
+      closeConfirmModal();
     }
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
   const handleGenerateReport = async () => {
-    setToast({ message: 'Relatório está sendo gerado...', type: 'info' });
+    showToast('Relatório está sendo gerado...', 'info');
 
     try {
       await generateReport();
-      setToast({ message: 'Relatório gerado com sucesso!', type: 'success' });
-    } catch (error) {
-      setToast({ message: 'Erro ao gerar relatório. Tente novamente.', type: 'error' });
+      showToast('Relatório gerado com sucesso!', 'success');
+    } catch {
+      showToast('Erro ao gerar relatório. Tente novamente.', 'error');
     }
   };
 
@@ -98,11 +113,11 @@ export default function Home() {
       </div>
       
       <div className={styles.tableContainer}>
-        {error && <p style={{ color: '#ef4444', textAlign: 'center', padding: '1rem' }}>Erro: {error}</p>}
         <Table 
           data={data}
           isLoading={isLoading}
-          onPageChange={handlePageChange}
+          error={error}
+          onPageChange={setCurrentPage}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
@@ -110,20 +125,11 @@ export default function Home() {
 
       <UserModal 
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedUser(null);
-        }}
+        onClose={closeModal}
         onSuccess={handleSuccess}
         onError={handleError}
         mode={selectedUser ? 'edit' : 'create'}
-        initialData={selectedUser ? {
-          id: selectedUser.id,
-          name: selectedUser.name,
-          cpf: selectedUser.cpf,
-          nascimento: selectedUser.nascimento,
-          sexo: selectedUser.sexo
-        } : undefined}
+        initialData={selectedUser ?? undefined}
       />
 
       {toast && (
@@ -139,10 +145,7 @@ export default function Home() {
         title="Confirmar exclusão"
         message="Tem certeza que deseja deletar este usuário? Esta ação não pode ser desfeita."
         onConfirm={confirmDelete}
-        onCancel={() => {
-          setIsConfirmModalOpen(false);
-          setUserIdToDelete(null);
-        }}
+        onCancel={closeConfirmModal}
         confirmText="Deletar"
         cancelText="Cancelar"
       />

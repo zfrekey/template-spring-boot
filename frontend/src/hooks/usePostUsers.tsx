@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { api } from '@/services/api';
 import { UserCreate } from '@/types/user';
+import { AxiosError } from 'axios';
 
 interface UsePostUsersReturn {
   postUser: (userData: UserCreate) => Promise<void>;
@@ -12,26 +13,20 @@ export function usePostUsers(): UsePostUsersReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postUser = async (userData: UserCreate) => {
+  const postUser = async (userData: UserCreate): Promise<void> => {
     setIsLoading(true);
     setError(null);
 
     try {
       const payload = {
         ...userData,
-        cpf: userData.cpf.replace(/\D/g, '')
+        cpf: userData.cpf.replace(/\D/g, ''),
       };
-      
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users`, 
-        payload
-      );
-      return data;
+
+      await api.post('/users', payload);
     } catch (err) {
-      const errorMessage = axios.isAxiosError(err) 
-        ? err.response?.data?.message || 'Erro ao criar usuário'
-        : 'Erro desconhecido';
-      setError(errorMessage);
+      const message = extractErrorMessage(err);
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);
@@ -39,4 +34,24 @@ export function usePostUsers(): UsePostUsersReturn {
   };
 
   return { postUser, isLoading, error };
+}
+
+function extractErrorMessage(err: unknown): string {
+  const defaultMessage = 'Erro ao criar usuário';
+
+  if (err instanceof AxiosError) {
+    const data = err.response?.data;
+    
+    if (typeof data === 'string' && data) {
+      return data;
+    }
+    
+    if (typeof data === 'object' && data !== null) {
+      return data.message ?? data.error ?? err.message ?? defaultMessage;
+    }
+    
+    return err.message ?? defaultMessage;
+  }
+
+  return defaultMessage;
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import { api } from '@/services/api';
 import { User, PageResponse } from '@/types/page';
+import axios from 'axios';
 
 interface PaginationParams {
   page: number;
@@ -48,8 +49,8 @@ export function useGetUsers({
         params.append('query', searchTerm);
       }
 
-      const response = await axios.get<PageResponse<User>>(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/paginated?${params.toString()}`
+      const response = await api.get<PageResponse<User>>(
+        `/users/paginated?${params.toString()}`
       );
 
       setData(response.data);
