@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN"
+        "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport
+        name="users_report"
+        pageWidth="595"
+        pageHeight="842"
+        columnWidth="555"
+        leftMargin="20"
+        rightMargin="20"
+        topMargin="20"
+        bottomMargin="20"
+        whenNoDataType="AllSectionsNoDetail">
+
+    <!-- Campos vindos de UserReportDTO (todos String) -->
+    <field name="name" class="java.lang.String"/>
+    <field name="cpf" class="java.lang.String"/>
+    <field name="nascimento" class="java.lang.String"/>
+    <field name="sexo" class="java.lang.String"/>
+    <field name="createdDate" class="java.lang.String"/>
+
+    <!-- TÍTULO -->
+    <title>
+        <band height="80">
+
+            <!-- Linha 1: título "Cadastro de Usuários" -->
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="22"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Cadastro de Usuários]]></text>
+            </staticText>
+
+            <!-- Linha 2: subtítulo Dataprev -->
+            <staticText>
+                <reportElement x="0" y="24" width="555" height="18"/>
+                <textElement textAlignment="Center">
+                    <font size="12" isBold="false" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Dataprev]]></text>
+            </staticText>
+
+            <!-- Linha 3: data/hora de geração -->
+            <textField>
+                <reportElement x="0" y="48" width="555" height="18"/>
+                <textElement textAlignment="Center">
+                    <font size="10" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    "Gerado em: "
+                    + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm")
+                      .format(new java.util.Date())
+                ]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </title>
+
+    <!-- CABEÇALHO DAS COLUNAS -->
+    <columnHeader>
+        <band height="25">
+            <staticText>
+                <reportElement x="0" y="5" width="170" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Nome]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="170" y="5" width="120" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[CPF]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="290" y="5" width="80" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Nascimento]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="370" y="5" width="60" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Sexo]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="450" y="5" width="105" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[Registrado em]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- LINHAS (DETALHE) -->
+    <detail>
+        <band height="26">
+
+            <!-- Nome (quebra de linha se for grande) -->
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="0" width="170" height="20"/>
+                <textElement>
+                    <font size="11"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+            </textField>
+
+            <!-- CPF -->
+            <textField>
+                <reportElement x="170" y="0" width="120" height="20"/>
+                <textFieldExpression><![CDATA[$F{cpf}]]></textFieldExpression>
+            </textField>
+
+            <!-- Nascimento -->
+            <textField>
+                <reportElement x="290" y="0" width="80" height="20"/>
+                <textFieldExpression><![CDATA[$F{nascimento}]]></textFieldExpression>
+            </textField>
+
+            <!-- Sexo -->
+            <textField>
+                <reportElement x="370" y="0" width="60" height="20"/>
+                <textFieldExpression><![CDATA[$F{sexo}]]></textFieldExpression>
+            </textField>
+
+            <!-- Registrado em -->
+            <textField>
+                <reportElement x="450" y="0" width="105" height="20"/>
+                <textFieldExpression><![CDATA[" " + $F{createdDate}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </detail>
+
+    <!-- RODAPÉ -->
+    <pageFooter>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="555" height="20"/>
+                <textElement textAlignment="Right">
+                    <font size="9" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+                    "Página " + $V{PAGE_NUMBER}
+                ]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+</jasperReport>
